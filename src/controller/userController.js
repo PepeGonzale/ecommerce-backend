@@ -4,7 +4,8 @@ const asyncHandler = require('express-async-handler');
 const { generateToken } = require('../config/jwtToken');
 const { validateMongoDbId } = require('../utils/validateMongodbID');
 const { generateRefreshToken } = require('../config/refreshToken');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const userModel = require('../models/userModel');
 
 const createUser = asyncHandler(async (req, res) => {
     const email = req.body.email;
@@ -154,6 +155,20 @@ const unlockUser = asyncHandler(async (req, res)=> {
         throw new Error(err)
     }
 })
+
+const updatePassword = asyncHandler(async (req, res) => {
+    const {_id} = req.user
+    const {password} = req.body
+    validateMongoDbId(_id);
+    const user = await userModel.findById(_id)
+    if (password) {
+        user.password = password
+        const updatePassword = await user.save()
+        res.json(updatePassword)
+    } else {
+        res.json(user)
+    }
+})
 module.exports = {
     createUser,
     loginUser,
@@ -164,5 +179,6 @@ module.exports = {
     blockUser,
     unlockUser,
     handleRefreshToken,
-    logout
+    logout,
+    updatePassword
 }

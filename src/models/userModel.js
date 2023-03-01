@@ -41,7 +41,10 @@ var userSchema = new mongoose.Schema({
     wishlisht: [{type: mongoose.Types.ObjectId, ref: "Product"}],
     refreshToken: {
         type: String
-    }
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date
         
     
 },{timestamps: true});
@@ -54,6 +57,16 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.isPasswordMatched = async function(enteredPassword) {
     // if password is correct return true, else false
     return await bcrypt.compare(enteredPassword, this.password);
+}
+
+userSchema.methods.createPasswordResetToken = async function() {
+    const resettoken = crypto.randomBytes(32).toString("hex")
+    this.PasswordResetToken = crypto
+    .createHash("sha256")
+    .update(resettoken)
+    .digest("hex")
+    this.passwordResetExpires = Date.now() * 30*60*1000
+    return resettoken
 }
 
 //Export the model
