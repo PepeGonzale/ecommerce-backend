@@ -3,13 +3,15 @@ const nodemailer =require('nodemailer')
 const asyncHandler =  require('express-async-handler')
 
 const sendEmail = asyncHandler(async (data, req, res) => {
+  let testAccount = await nodemailer.createTestAccount();
+
     let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
         secure: false, // true for 465, false for other ports
         auth: {
-          user: "", // generated ethereal user
-          pass: "", // generated ethereal password
+          user: "pepeglezdevega@gmail.com", // generated ethereal user
+          pass: "hrfzmzswicdcqrlq"
         },
       });
     
@@ -30,4 +32,4 @@ const sendEmail = asyncHandler(async (data, req, res) => {
       // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
     
 })
-module.exports = sendEmail
+module.exports = {sendEmail}

@@ -6,6 +6,8 @@ const { validateMongoDbId } = require('../utils/validateMongodbID');
 const { generateRefreshToken } = require('../config/refreshToken');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
+const crypto = require('crypto')
+const { sendEmail } = require('./emailController');
 
 const createUser = asyncHandler(async (req, res) => {
     const email = req.body.email;
@@ -169,6 +171,51 @@ const updatePassword = asyncHandler(async (req, res) => {
         res.json(user)
     }
 })
+const forgotPasswordToken = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const findUser = await userModel.findOne({ email });
+    if (!findUser) throw new Error("User not found with this email")
+    try {
+        const token = await findUser.createPasswordResetToken();
+        console.log(token);
+        await findUser.save();
+        const resetUrl = `Hi, please follow this link to reset Your password. This link i valid till 10 minutes from now. <a href='http://localhost:3000/api/user/reset-password/${token}>Click here</a>`
+        const data = {
+            to: email,
+            subject: "Forgor Password Link",
+            text: "Hey User",
+            html: resetUrl,
+            
+        }
+        sendEmail(data)
+        res.json(token)
+    } catch (err) {
+        throw new Error(err)
+    }
+
+})
+
+const resetPassword  = asyncHandler(async (req, res) => {
+    const { password } = req.body;
+    const { token } = req.params; 
+    try {
+    const hashedTken = crypto.createHash("sha256").update(token).digest("hex");
+    console.log(hashedTken);
+    const user = await userModel.findOne({
+        passwordResetToken: hashedTken,
+        passwordResetExpires: {$gt: Date.now()}
+    });
+
+    if(!user) throw new Error("Token Expired, Please try again!")
+    user.password = password;
+    user.passwordResetToken = undefined
+    user.passwordResetExpires = undefined;
+    await user.save();
+    res.json(user);
+} catch(err) {
+ throw new Error(err)
+}
+})
 module.exports = {
     createUser,
     loginUser,
@@ -180,5 +227,7 @@ module.exports = {
     unlockUser,
     handleRefreshToken,
     logout,
-    updatePassword
+    updatePassword,
+    resetPassword,
+    forgotPasswordToken
 }
