@@ -1,7 +1,7 @@
 const slugify = require('slugify')
 const asyncHandler = require('express-async-handler')
 const productModel = require('../models/productModel')
-
+const User = require("../models/userModel")
 const createProduct = asyncHandler(async (req, res) => {
     try {
         if(req.body.title) {
@@ -58,7 +58,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
         if(req.query.page) {
             const productCount = await productModel.countDocuments()
             console.log(productCount);
-            if(skip>=productCOunt) throw new Error('This page does not exist')
+            if(skip>=productCount) throw new Error('This page does not exist')
         }
         console.log(page, limit, skip);
 
@@ -92,4 +92,28 @@ const deleteProduct = asyncHandler(async (req, res) => {
         throw new Error(err)
     }
 })
-module.exports = {createProduct, getProduct, getAllProduct, updateProduct, deleteProduct}
+
+const addToWishList = asyncHandler(async (req,res) => {
+    const {_id} = req.user;
+    const {prodId} = req.body;
+    try {
+        const user = await User.findById(_id)
+        
+        const alreadyAdded = user.wishlisht.find((id) => id.toString() === prodId)
+        console.log(alreadyAdded);
+        if (alreadyAdded) {
+            let user = await User.findByIdAndUpdate(_id, {
+                $pull: {wishlisht: prodId}
+            }, {new: true})
+            res.json(user)
+        } else {
+            let user = await User.findByIdAndUpdate(_id, {
+                $push: { wishlisht: prodId }
+            }, {new: true})
+            res.json(user)
+        }
+    } catch(err) {
+        throw new Error(err)
+    }
+}) 
+module.exports = {createProduct, getProduct, getAllProduct, updateProduct, deleteProduct, addToWishList}

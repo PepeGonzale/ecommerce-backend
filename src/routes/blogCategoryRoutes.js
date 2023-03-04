@@ -1,5 +1,5 @@
 const {Router} = require('express');
-const { createCategory, updateCategory,  deleteCategory, getCategory, getAllCategories } = require('../controller/categoryController');
+const { createCategory, updateCategory,  deleteCategory, getCategory, getAllCategories } = require('../controller/blogCategory');
 const {authMiddleware} = require('../middleware/authMiddleware')
 const router = Router();
 router.get("/:id",  getCategory)
