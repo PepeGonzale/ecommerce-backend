@@ -1,8 +1,8 @@
 const { default: mongoose } = require("mongoose")
-
+require('dotenv').config()
 const dbConnect = (a) => {
     try{
-    const connection = mongoose.connect("mongodb+srv://PepeGonzale:hYG2WxqARYIsJWIK@cluster0.zvzqoy1.mongodb.net/ecommerce?retryWrites=true")
+    const connection = mongoose.connect(process.env.MONGODB_URI)
     .then(console.log("Db connected succesfully"))
     
     } catch(err) {
