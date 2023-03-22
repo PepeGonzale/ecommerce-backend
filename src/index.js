@@ -6,8 +6,8 @@ const morgan = require('morgan')
 const config = require('./config/config')
 const cookieParser = require('cookie-parser')
 const {errorHandler, notFound } = require('./middleware/errorHandler')
-console.log(process.env.PORT);
-const PORT = process.env.PORT || 3000
+
+const PORT = process.env.PORT || 3001
 const authRouter = require('./routes/authRoutes')
 const blogRouter = require('./routes/blogRoutes')
 const categoryRouter = require('./routes/categoryRoutes')
