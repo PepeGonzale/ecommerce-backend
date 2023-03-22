@@ -1,5 +1,5 @@
 const express = require('express')
-const { createUser, loginUser,  getAllUser, getUser, deleteUser, updateUser, unlockUser, blockUser, logout,handleRefreshToken, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, getWishlith, saveAddress, userCart, getUserCart, emptyCart, applyCoupon } = require('../controller/userController')
+const { createUser, loginUser,  getAllUser, getUser, deleteUser, updateUser, unlockUser, blockUser, logout,handleRefreshToken, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, getWishlith, saveAddress, userCart, getUserCart, emptyCart, applyCoupon, createOrder, listOrder, updateOrderStatus } = require('../controller/userController')
 const {authMiddleware, isAdmin} = require('../middleware/authMiddleware')
 
 const router = express.Router()
@@ -9,8 +9,13 @@ router.get("/logout", logout)
 router.get("/refreshing", handleRefreshToken)
 router.get("/all-users", getAllUser)
 router.get("/users/cart",authMiddleware, getUserCart)
+router.get("/list/orders",authMiddleware, listOrder)
+
 router.post("/empty/cart",authMiddleware, emptyCart)
+router.post("/update/order/status/:statusId",authMiddleware, isAdmin,updateOrderStatus)
 router.post("/cart/coupon",authMiddleware, applyCoupon)
+
+router.post("/cart/order",authMiddleware, createOrder)
 
 
 router.get("/:id",authMiddleware,isAdmin, getUser)
