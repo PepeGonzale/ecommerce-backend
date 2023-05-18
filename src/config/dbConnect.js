@@ -1,10 +1,10 @@
 const { default: mongoose } = require("mongoose")
 const config = require('./config')
 
-const dbConnect = (a) => {
+const dbConnect = async (a) => {
     console.log(config.MONGODB_URI)
     try{
-    const connection = mongoose.connect(config.MONGODB_URI)
+    const connection = await mongoose.connect(config.MONGODB_URI)
     .then(console.log("Db connected succesfully"))
     
     } catch(err) {
